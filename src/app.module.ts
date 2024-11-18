@@ -5,7 +5,14 @@ import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DietProgramModule } from './diet_program/diet_program.module';
+import { RecommendationService } from './recommendation/recommendation.service';
+import { RecommendationModule } from './recommendation/recommendation.module';
 import config from './config/config';
+import { RecommendationController } from './recommendation/recommendation.controller';
+import { DietProgramService } from './diet_program/diet_program.service';
+import { DietProgramController } from './diet_program/diet_program.controller';
+import { WorkoutProgramModule } from './workout_program/workout_program.module';
 
 @Module({
   imports: [
@@ -17,7 +24,7 @@ import config from './config/config';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (config) => ({
-        secret: config.get('jwt.secret'),
+       secret: config.get('jwt.secret'),
       }),
       global: true,
       inject: [ConfigService],
@@ -30,8 +37,12 @@ import config from './config/config';
       inject: [ConfigService],
     }),
     AuthModule,
+    DietProgramModule,
+    RecommendationModule,
+    WorkoutProgramModule,
+    
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,],
 })
 export class AppModule {}
