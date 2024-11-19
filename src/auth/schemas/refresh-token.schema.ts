@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
+import { Document, SchemaTypes, Types } from 'mongoose';
+import { User } from './user.schema'; // Import the User schema
 import { v4 as uuidv4 } from 'uuid';
 
 @Schema({ versionKey: false, timestamps: true })
@@ -13,8 +14,8 @@ export class RefreshToken extends Document {
   @Prop({ required: true, maxlength: 255 })
   token: string;
 
-  @Prop({ required: true, type: Number })
-  userId: number;
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'User', required: true }) // Reference to User
+  userId: Types.ObjectId;
 
   @Prop({ required: true, type: Date })
   expiryDate: Date;

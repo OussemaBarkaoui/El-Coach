@@ -101,14 +101,15 @@ export class AuthService {
     if (user) {
       //If user exists, generate password reset link
       const expiryDate = new Date();
-      expiryDate.setHours(expiryDate.getHours() + 1);
+      expiryDate.setHours(expiryDate.getHours() + 6);
 
-      const resetToken = nanoid(64);
+      const resetToken = Math.floor(1000 + Math.random() * 9000);
       await this.ResetTokenModel.create({
         token: resetToken,
         userId: user._id,
-        expiryDate,
+        expiryDate: expiryDate, // Use the previously calculated expiry date
       });
+      
       //Send the link to the user by email
       this.mailService.sendPasswordResetEmail(email, resetToken);
     }
@@ -116,26 +117,32 @@ export class AuthService {
     return { message: 'If this user exists, they will receive an email' };
   }
 
-  async resetPassword(newPassword: string, resetToken: string) {
-    //Find a valid reset token document
+  async resetPassword(newPassword: string, resetToken: number) {
+    console.log('Received reset token:', resetToken);
+  
+    // Find a valid reset token document
     const token = await this.ResetTokenModel.findOneAndDelete({
       token: resetToken,
       expiryDate: { $gte: new Date() },
     });
-
+  
+    console.log('Token from DB:', token);
+    
     if (!token) {
-      throw new UnauthorizedException('Invalid link');
+      throw new UnauthorizedException('Invalid or expired reset token');
     }
-
-    //Change user password (MAKE SURE TO HASH!!)
+  
+    // Change user password (MAKE SURE TO HASH!!)
     const user = await this.UserModel.findById(token.userId);
     if (!user) {
       throw new InternalServerErrorException();
     }
-
+  
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
   }
+  
+  
 
   async refreshTokens(refreshToken: string) {
     const token = await this.RefreshTokenModel.findOne({

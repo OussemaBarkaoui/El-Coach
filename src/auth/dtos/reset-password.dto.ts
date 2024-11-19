@@ -1,8 +1,8 @@
-import { IsString, Matches, MinLength } from 'class-validator';
+import { IsNumber, IsString, Matches, MinLength } from 'class-validator';
 
 export class ResetPasswordDto {
-  @IsString()
-  resetToken: string;
+  @IsNumber()
+  resetToken: number;
 
   @IsString()
   @MinLength(6)

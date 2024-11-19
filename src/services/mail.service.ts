@@ -11,19 +11,18 @@ export class MailService {
       host: 'smtp.ethereal.email',
       port: 587,
       auth: {
-        user: 'lilla.terry55@ethereal.email',
-        pass: 'yQQSg25MR1QwugbNnN',
+        user: 'katharina.willms@ethereal.email',
+        pass: 'Pb4CT53UmkewBeeZuM',
       },
     });
   }
 
-  async sendPasswordResetEmail(to: string, token: string) {
-    const resetLink = `http://yourapp.com/reset-password?token=${token}`;
+  async sendPasswordResetEmail(email: string, resetCode: number): Promise<void> {
     const mailOptions = {
-      from: 'Auth-backend service',
-      to: to,
-      subject: 'Password Reset Request',
-      html: `<p>You requested a password reset. Click the link below to reset your password:</p><p><a href="${resetLink}">Reset Password</a></p>`,
+      from: 'Auth-backend service <bethel.fahey52@ethereal.email>',
+      to: email,
+      subject: 'Password Reset Code',
+      text: `Your password reset code is: ${resetCode}`,
     };
 
     await this.transporter.sendMail(mailOptions);

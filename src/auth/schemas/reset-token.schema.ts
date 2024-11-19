@@ -4,7 +4,7 @@ import mongoose, { Document } from 'mongoose';
 @Schema({ versionKey: false, timestamps: true })
 export class ResetToken extends Document {
   @Prop({ required: true })
-  token: string;
+  token: number;
   @Prop({ required: true, type: mongoose.Types.ObjectId })
   userId: mongoose.Types.ObjectId;
   @Prop({ required: true })
