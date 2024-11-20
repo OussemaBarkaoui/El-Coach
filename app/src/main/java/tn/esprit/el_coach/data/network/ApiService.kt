@@ -3,7 +3,6 @@ package tn.esprit.el_coach.data.network
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
-
 import retrofit2.Call
 
 // Request model for login
@@ -23,8 +22,8 @@ data class SignUpRequest(
     val name : String,
     val email: String,
     val password: String,
-    val image:String,
-    val phoneNumber:Int
+    val image: String,
+    val phoneNumber: Int
 )
 
 data class SignUpResponse(
@@ -35,8 +34,7 @@ data class SignUpResponse(
 data class ForgotPasswordRequest(val email: String)
 data class ForgotPasswordResponse(val message: String, val resetCode: String)
 
-data class VerifyCodeRequest(val email: String ,val code: String)
-
+data class VerifyCodeRequest(val email: String, val code: String)
 data class VerifyCodeResponse(val message: String)
 
 data class ResetPasswordRequest(
@@ -45,14 +43,27 @@ data class ResetPasswordRequest(
     val newPassword: String
 )
 
+// Nouvelle classe de données pour la requête de connexion Google
+data class GoogleSignInRequest(
+    val idToken: String,
+    val email: String? = null,
+    val displayName: String? = null
+)
 
+// Si vous avez besoin d'une réponse spécifique pour Google Sign-In
+data class GoogleSignInResponse(
+    val accessToken: String,
+    val refreshToken: String,
+    val userId: String,
+    val email: String?,
+    val displayName: String?
+)
 
 interface ApiService {
-    @POST("auth/signup") // Ensure this matches your backend route
+    @POST("auth/signup")
     suspend fun signUp(@Body signupRequest: SignUpRequest): Response<SignUpResponse>
 
-    // Login API
-    @POST("auth/login")  // Adjust to match your login endpoint in the backend
+    @POST("auth/login")
     suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
 
     @POST("auth/forgot-password")
@@ -63,4 +74,8 @@ interface ApiService {
 
     @POST("auth/reset-password")
     fun resetPassword(@Body request: ResetPasswordRequest): Call<Void>
+
+    // Nouvelle endpoint pour la connexion Google
+    @POST("auth/google")
+    suspend fun googleSignIn(@Body request: GoogleSignInRequest): Response<LoginResponse>
 }

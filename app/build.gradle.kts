@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation ("com.google.android.gms:play-services-auth:20.6.0")
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.play.services.base)
     testImplementation(libs.junit)

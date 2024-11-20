@@ -1,8 +1,11 @@
 package tn.esprit.el_coach.ui.theme.login
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -59,6 +62,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import tn.esprit.el_coach.BottomNavigationItems
 import tn.esprit.el_coach.R
 import tn.esprit.el_coach.Routes
@@ -88,6 +94,32 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
         }
     }
 
+
+    val googleSignInClient = remember {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("883402420156-a7c8u8f588ok0no3dm5mlodseul1h0ku.apps.googleusercontent.com") // Remplacez par votre client ID
+            .requestEmail()
+            .build()
+        GoogleSignIn.getClient(context, gso)
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                account?.idToken?.let { token ->
+                    // Appeler la méthode de viewModel pour gérer la connexion Google
+                    viewModel.handleGoogleSignIn(token)
+                }
+            } catch (e: ApiException) {
+                Log.e("GoogleSignIn", "Google sign in failed", e)
+            }
+        }
+    }
+
     val emailPattern = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$")
     val loginUiState by viewModel.loginUiState.observeAsState(LoginUiState())
 
@@ -111,7 +143,7 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
         modifier = modifier.fillMaxSize()
     ) {
         Image(
-            painter = painterResource(id = R.drawable.back2),
+            painter = painterResource(id = R.drawable.backk),
             contentDescription = "Background",
             alpha = 0.6f,
             modifier = Modifier.fillMaxSize(),
@@ -168,7 +200,11 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, if (emailError) Color.Red else iconAndLabelColor, RoundedCornerShape(12.dp)),
+                    .border(
+                        1.dp,
+                        if (emailError) Color.Red else iconAndLabelColor,
+                        RoundedCornerShape(12.dp)
+                    ),
                 shape = RoundedCornerShape(12.dp),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = backgroundColor,
@@ -206,7 +242,11 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, if (passwordError) Color.Red else iconAndLabelColor, RoundedCornerShape(12.dp)),
+                    .border(
+                        1.dp,
+                        if (passwordError) Color.Red else iconAndLabelColor,
+                        RoundedCornerShape(12.dp)
+                    ),
                 shape = RoundedCornerShape(12.dp),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = backgroundColor,
@@ -233,8 +273,10 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
                         }
                     }
                 )
-                Text(text = "Remember me",
-                    fontWeight = FontWeight.Bold )
+                Text(
+                    text = "Remember me",
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             Button(
@@ -285,7 +327,6 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
             }
 
 
-
             // Forgot password link
             Text(
                 "Forgot password",
@@ -323,22 +364,32 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
 
             Spacer(modifier = Modifier.height(12.dp))
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .padding(bottom = 37.dp, start = 20.dp, end = 20.dp)
-                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(12.dp))
+                    .width(160.dp)
+                    .background(color = Color(0xFFB1BAC7), shape = RoundedCornerShape(12.dp))
+                    .padding(vertical = 12.dp)
+                    .clickable {
+                        launcher.launch(googleSignInClient.signInIntent)
+                    }
             ) {
-                SocialButtonWithIcon(label = "Google", iconRes = R.drawable.google)
-                SocialButtonWithIcon(label = "Facebook", iconRes = R.drawable.facebok1)
+                Image(
+                    painter = painterResource(id = R.drawable.google),
+                    contentDescription = "Google Sign In",
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(18.dp)
+
+                )
+                Text(
+                    "Google",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                )
             }
         }
-
-        // Snackbar Host for feedback
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
     }
 }
 
