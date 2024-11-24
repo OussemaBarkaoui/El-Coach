@@ -17,9 +17,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { nanoid } from 'nanoid';
 import { ResetToken } from './schemas/reset-token.schema';
 import { MailService } from 'src/services/mail.service';
+import { OAuth2Client } from 'google-auth-library';
+import { CompleteProfileDto } from './dtos/complete-profile.dto';
 
 @Injectable()
 export class AuthService {
+  private oauthClient: OAuth2Client;
   constructor(
     @InjectModel(User.name) private UserModel: Model<User>,
     @InjectModel(RefreshToken.name)
@@ -28,7 +31,10 @@ export class AuthService {
     private ResetTokenModel: Model<ResetToken>,
     private jwtService: JwtService,
     private mailService: MailService,
-  ) {}
+  ) {
+    this.oauthClient = new OAuth2Client('883402420156-a7c8u8f588ok0no3dm5mlodseul1h0ku.apps.googleusercontent.com'); // Replace with your client ID
+
+  }
 
   async signup(signupData: SignupDto) {
     const { email, password, fullName, image, phoneNumber } = signupData;
@@ -74,7 +80,56 @@ export class AuthService {
       userId: user._id,
     };
   }
+  async completeProfile(profileDto: CompleteProfileDto, usrId: string) {
+    try {
+        // Find the user by ID
+        console.log('User ID:', usrId);
+const user = await this.UserModel.findById(usrId);
+console.log('User:', user);
 
+        
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        // Update user profile with new information
+        const updatedUser = await this.UserModel.findByIdAndUpdate(
+            usrId,
+            {
+                fitnessGoal: profileDto.fitnessGoal,
+                activityLevel: profileDto.activityLevel,
+                height: profileDto.height,
+                weight: profileDto.weight
+            },
+            { new: true } // Return the updated document
+        );
+
+        return {
+            success: true,
+            message: 'Profile completed successfully',
+            user: {
+                id: updatedUser._id,
+                email: updatedUser.email,
+                fullName: updatedUser.fullName,
+                phoneNumber: updatedUser.phoneNumber,
+                fitnessGoal: updatedUser.fitnessGoal,
+                activityLevel: updatedUser.activityLevel,
+                height: updatedUser.height,
+                weight: updatedUser.weight
+            }
+        };
+
+    } catch (error) {
+        if (error instanceof NotFoundException) {
+            throw error;
+        }
+        throw new InternalServerErrorException({
+            success: false,
+            message: 'Error completing profile',
+            error: error.message
+        });
+    }
+}
   async changePassword(userId, oldPassword: string, newPassword: string) {
     //Find the user
     const user = await this.UserModel.findById(userId);
@@ -180,6 +235,54 @@ export class AuthService {
       },
     );
   }
+   async verifyGoogleToken(idToken: string) {
+    try {
+      const ticket = await this.oauthClient.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
 
+      if (!payload) {
+        throw new UnauthorizedException('Invalid Google Token');
+      }
+      return payload;
+    } catch (error) {
+      throw new UnauthorizedException('Google token verification failed');
+    }
+  }
+
+  /**
+   * Handles Google Sign-In and user creation.
+   */
+  async handleGoogleSignIn(idToken: string) {
+    const payload = await this.verifyGoogleToken(idToken);
+    console.log('Received Google ID Token:', idToken);
+
+    // Check if user exists
+    let user: User = await this.UserModel.findOne({ email: payload.email });
+
+    if (!user) {
+      // Create new user if not found
+      user = await this.UserModel.create({
+        email: payload.email,
+        fullName: payload.name+payload.family_name,
+        imageUrl: payload.picture,
+      });
+    }
+
+    // Generate JWT tokens
+    const accessToken = this.jwtService.sign({ userId: user.id });
+    const refreshToken = this.jwtService.sign(
+      { userId: user.id },
+      { expiresIn: '7d' },
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+      user,
+    };
+  }
   
 }

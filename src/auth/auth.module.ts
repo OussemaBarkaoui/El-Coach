@@ -9,9 +9,11 @@ import {
 } from './schemas/refresh-token.schema';
 import { ResetToken, ResetTokenSchema } from './schemas/reset-token.schema';
 import { MailService } from 'src/services/mail.service';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from 'src/guard/jwt.strategy';
 
 @Module({
-  imports: [
+  imports: [PassportModule.register({ defaultStrategy: 'jwt' }),
     MongooseModule.forFeature([
       {
         name: User.name,
@@ -28,7 +30,7 @@ import { MailService } from 'src/services/mail.service';
     ]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, MailService],
+  providers: [AuthService, MailService, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

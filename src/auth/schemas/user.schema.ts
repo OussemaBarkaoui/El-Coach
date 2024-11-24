@@ -19,16 +19,16 @@ export class User extends Document {
   phoneNumber: number;
   
   @Prop({ required: false })
-  fitnessGoal: string; // e.g., "muscle gain", "weight loss"
+  fitnessGoal: string;
 
   @Prop({ required: false })
-  activityLevel: string; // e.g., "sedentary", "moderate", "intense"
+  activityLevel: string;
 
   @Prop({ required: false })
-  bodyType: string; // e.g., "ectomorph", "endomorph", "mesomorph"
+  height: number; 
 
   @Prop({ required: false })
-  gender: string; // e.g., "male", "female"
+  weight: number; 
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -20,8 +20,9 @@ export class RecommendationService {
     return this.dietProgramModel.find({
       goal: user.fitnessGoal,
       activityLevel: user.activityLevel,
-      compatibleBodyTypes: user.bodyType,
-      targetGenders: { $in: [user.gender] },
+      compatibleBodyTypes: user.height,
+      compatibleWeights: user.weight,
+       
     }).exec();
   }
 }

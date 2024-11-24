@@ -6,6 +6,10 @@ import { RefreshTokenDto } from './dtos/refresh-tokens.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
 import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { CompleteProfileDto } from './dtos/complete-profile.dto';
+import { User } from './schemas/user.schema';
+import { GetUser } from 'src/decoder/get-user.decorator';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -54,4 +58,21 @@ export class AuthController {
       resetPasswordDto.resetToken,
     );
   }
+  @Post('google')
+  async googleSignIn(@Body('idToken') idToken: string) {
+    console.log('Received Google ID Token:', idToken);
+    return this.authService.handleGoogleSignIn(idToken);
+  }
+
+  @Put('complete-profile')
+  @UseGuards(AuthGuard('jwt'))
+  async completeProfile(
+      @Body() profileDto: CompleteProfileDto,
+      @Req() req
+  ) {
+      console.log('Authenticated User:', req.user); // Debug log
+      const userId = req.user.userId; // Extract `userId` from `req.user`
+      return this.authService.completeProfile(profileDto, userId);
+  }
+  
 }
