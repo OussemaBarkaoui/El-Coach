@@ -38,4 +38,5 @@ class ViewModelFactory(private val userRepository: UserRepository) : ViewModelPr
             return factory!!
         }
     }
+
 }

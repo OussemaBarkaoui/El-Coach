@@ -73,6 +73,13 @@ dependencies {
     implementation ("com.google.android.gms:play-services-auth:20.5.0")
     implementation("androidx.credentials:credentials:1.5.0-alpha05")
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation ("androidx.compose.material:material-icons-extended:1.0.1")
+    implementation ("com.google.android.exoplayer:exoplayer:2.18.2")
+    implementation ("com.github.bumptech.glide:glide:4.15.1")
+    kapt ("com.github.bumptech.glide:compiler:4.15.1")
+    implementation("com.google.accompanist:accompanist-pager:0.22.0-rc")
+    implementation ("androidx.media3:media3-exoplayer:1.1.1")
+    implementation ("androidx.media3:media3-ui:1.1.1")
     // Retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("io.coil-kt:coil-compose:2.3.0")

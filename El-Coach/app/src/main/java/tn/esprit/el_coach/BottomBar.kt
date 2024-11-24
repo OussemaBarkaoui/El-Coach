@@ -25,8 +25,8 @@ fun BottomBar(
         BottomNavigationItems.Home,
         BottomNavigationItems.Reminder,
 
-        BottomNavigationItems.Favorite
-
+        BottomNavigationItems.Favorite,
+        BottomNavigationItems.Workout
     )
     NavigationBar (modifier = modifier,
         containerColor = Color(0xFF2980B9)
