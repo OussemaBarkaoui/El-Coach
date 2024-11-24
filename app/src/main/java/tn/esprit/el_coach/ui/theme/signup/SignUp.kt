@@ -28,7 +28,6 @@ import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -106,7 +105,7 @@ fun SignUp(navController: NavHostController = rememberNavController(), // Defaul
     val iconAndLabelColor = Color(0xFF2A4E62)
     var confirmPasswordError by remember { mutableStateOf<String?>(null) }
     var confirmPassword by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+    val passwordVisible by remember { mutableStateOf(false) }
 
     val buttonColor = Color(0xFF001C2F)
     val imagePickerLauncher = rememberLauncherForActivityResult(
@@ -158,7 +157,7 @@ fun SignUp(navController: NavHostController = rememberNavController(), // Defaul
                 val imagePainter = if (profilePicUri.value.isNotBlank()) {
                     rememberAsyncImagePainter(profilePicUri.value) // Load selected image URI
                 } else {
-                    painterResource(id = R.drawable.user) // Use default image resource
+                    painterResource(id = R.drawable.img) // Use default image resource
                 }
 
                 Image(

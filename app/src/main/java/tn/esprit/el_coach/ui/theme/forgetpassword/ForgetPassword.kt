@@ -1,6 +1,5 @@
 package tn.esprit.el_coach.ui.theme.forgetpassword
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,8 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,7 +35,6 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import tn.esprit.el_coach.R
 import tn.esprit.el_coach.Routes
 import tn.esprit.el_coach.data.network.ForgotPasswordRequest
 import tn.esprit.el_coach.data.network.ForgotPasswordResponse
@@ -76,7 +72,7 @@ fun ForgetPassword(navController: NavController) {
                     .fillMaxWidth()
                     .padding(8.dp),
                 shape = RoundedCornerShape(12.dp),
-                elevation = CardDefaults.cardElevation(6.dp),
+                elevation = CardDefaults.cardElevation(6.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -132,7 +128,7 @@ fun ForgetPassword(navController: NavController) {
                                                 if (response.isSuccessful) {
                                                     resetMessage.value = "Reset email sent successfully."
                                                     showSuccessMessage.value = true
-                                                    navController.navigate(Routes.ConfirmCode.route)
+                                                    navController.navigate(Routes.ResetPass.route)
                                                 } else {
                                                     resetMessage.value = "Failed to send reset email."
                                                     showSuccessMessage.value = false

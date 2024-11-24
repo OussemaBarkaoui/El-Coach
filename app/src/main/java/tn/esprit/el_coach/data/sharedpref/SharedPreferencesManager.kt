@@ -1,16 +1,18 @@
 package tn.esprit.el_coach.data.sharedpref
 
-
 import android.content.Context
+
 class SharedPreferencesManager(context: Context) {
 
     private val sharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
 
-    // Save token and rememberMe flag
-    fun saveToken(token: String, rememberMe: Boolean) {
+    // Save token, rememberMe flag, image, and fullName
+    fun saveToken(token: String, rememberMe: Boolean, image: String, fullName: String) {
         val editor = sharedPreferences.edit()
         editor.putString("token", token)
         editor.putBoolean("rememberMe", rememberMe)
+        editor.putString("image", image)
+        editor.putString("fullName", fullName)
         editor.apply()
     }
 
@@ -24,11 +26,23 @@ class SharedPreferencesManager(context: Context) {
         return sharedPreferences.getBoolean("rememberMe", false)
     }
 
-    // Clear token and rememberMe flag
+    // Get the stored image
+    fun getImage(): String? {
+        return sharedPreferences.getString("image", null)
+    }
+
+    // Get the stored fullName
+    fun getFullName(): String? {
+        return sharedPreferences.getString("fullName", null)
+    }
+
+    // Clear token, rememberMe flag, image, and fullName
     fun clearToken() {
         val editor = sharedPreferences.edit()
         editor.remove("token")
         editor.remove("rememberMe")
+        editor.remove("image")
+        editor.remove("fullName")
         editor.apply()
     }
 }

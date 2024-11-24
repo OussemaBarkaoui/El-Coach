@@ -27,6 +27,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -36,8 +39,7 @@ import tn.esprit.el_coach.data.network.RetrofitClient
 
 @Composable
 fun ResetPass(navController: NavController) {
-    var email by remember { mutableStateOf("") }
-    var code by remember { mutableStateOf("") }
+    var resetToken by remember { mutableStateOf(0) }
     var newPassword by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf("") }
@@ -60,27 +62,20 @@ fun ResetPass(navController: NavController) {
             )
 
             // Email TextField
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email", color = Color.White) },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-                modifier = Modifier.fillMaxWidth(),
-                isError = email.isEmpty(),
-                textStyle = TextStyle(color = Color.White)
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Verification Code TextField
             OutlinedTextField(
-                value = code,
-                onValueChange = { code = it },
-                label = { Text("Verification Code", color = Color.White) },
+                value = resetToken.toString(),  // Convert the integer to string for display
+                onValueChange = {
+                    // Only allow numeric input and update the code
+                    resetToken = it.toIntOrNull() ?: 0
+                },
+                label = { Text("Verification Code", color = Color.Black) },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
-                isError = code.isEmpty(),
-                textStyle = TextStyle(color = Color.White)
+                isError = resetToken == 0,  // Show error if the code is 0 (initial state)
+                textStyle = TextStyle(color = Color.Black)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -89,51 +84,50 @@ fun ResetPass(navController: NavController) {
             OutlinedTextField(
                 value = newPassword,
                 onValueChange = { newPassword = it },
-                label = { Text("New Password", color = Color.White) },
+                label = { Text("New Password", color = Color.Black) },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
                 modifier = Modifier.fillMaxWidth(),
                 isError = newPassword.isEmpty(),
-                textStyle = TextStyle(color = Color.White)
+                textStyle = TextStyle(color = Color.Black)
             )
-
+            println(resetToken)
             Spacer(modifier = Modifier.height(16.dp))
-
             // Submit Button
             Button(
                 onClick = {
-                    // Reset message when a request is sent
-                    message = ""
-
-                    if (email.isNotEmpty() && code.isNotEmpty() && newPassword.isNotEmpty()) {
+                    if (resetToken!=0 && newPassword.isNotEmpty()) {
                         isLoading = true
-                        // Send API request to reset password
-                        RetrofitClient.getApiService().resetPassword(request = ResetPasswordRequest(email, code, newPassword))
-                            .enqueue(object : Callback<Void> {
-                                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                                    isLoading = false
-                                    if (response.isSuccessful) {
-                                        message = "Password reset successfully!"
-                                        navController.navigate(Routes.Login.route) // Navigate back after success
-                                    } else {
-                                        message = "Error: ${response.message()}"
-                                    }
+                        println(resetToken)
+                        RetrofitClient.getApiService().resetPassword(
+                            ResetPasswordRequest(resetToken, newPassword)
+                        ).enqueue(object : Callback<Void> {
+                            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                isLoading = false
+                                if (response.isSuccessful) {
+                                    message = "Password updated successfully!"
+                                    navController.navigate(Routes.Login.route)
+                                } else {
+                                    val errorBody = response.errorBody()?.string()
+                                    Log.e("ResetPassword", "Failed: ${response.message()}, Error: $errorBody")
+                                    message = "Failed: ${response.message()}"
                                 }
+                            }
 
-                                override fun onFailure(call: Call<Void>, t: Throwable) {
-                                    isLoading = false
-                                    message = "Error: ${t.localizedMessage}"
-                                    Log.e("ResetPass", "Error occurred: ${t.localizedMessage}", t)
-                                }
-                            })
+                            override fun onFailure(call: Call<Void>, t: Throwable) {
+                                isLoading = false
+                                Log.e("ResetPassword", "Error: ${t.localizedMessage}")
+                                message = "Error: ${t.localizedMessage}"
+                            }
+                        })
                     } else {
-                        message = "Please fill all fields."
+                        message = "Please enter a valid 4-digit code and new password."
                     }
                 },
                 enabled = !isLoading
             ) {
                 Text(text = if (isLoading) "Resetting..." else "Reset Password", color = Color.White)
             }
-
+            println(resetToken)
             Spacer(modifier = Modifier.height(16.dp))
 
             // Display any messages after the request

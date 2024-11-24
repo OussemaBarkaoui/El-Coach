@@ -25,11 +25,12 @@ fun BottomBar(
         BottomNavigationItems.Home,
         BottomNavigationItems.Reminder,
 
-        BottomNavigationItems.Favorite
-
+        BottomNavigationItems.Favorite,
+        BottomNavigationItems.Workout,
+        BottomNavigationItems.Profile
     )
     NavigationBar (modifier = modifier,
-        containerColor = Color(0xFF2980B9)
+        containerColor = Color(0xFF001C2F)
         //Color(0xFF30BE30)
     ){
         val navBackStackEntry = navController.currentBackStackEntryAsState().value
@@ -65,6 +66,7 @@ fun BottomBar(
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun BottomBarPreview() {

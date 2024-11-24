@@ -6,6 +6,8 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.google.android.gms.common.api.Api
+import androidx.compose.material.icons.outlined.FitnessCenter
+import androidx.compose.material.icons.outlined.Person
 
 
 sealed class BottomNavigationItems (
@@ -20,6 +22,11 @@ sealed class BottomNavigationItems (
         title = "Home",
         icon = Icons.Outlined.Home
     )
+    object Workout : BottomNavigationItems(
+        route = "Workout",
+        title = "Workout",
+        icon = Icons.Outlined.FitnessCenter
+    )
 
     object Reminder : BottomNavigationItems(
         route = "Reminder",
@@ -33,5 +40,12 @@ sealed class BottomNavigationItems (
         route = "Favorite",
         title = "Favorite",
         icon = Icons.Outlined.Favorite
+    )
+
+
+    object Profile : BottomNavigationItems(
+        route = "Profile",
+        title = "Profile",
+        icon = Icons.Outlined.Person
     )
 }
